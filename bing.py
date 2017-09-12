@@ -22,6 +22,7 @@ except IndexError:
 #wait random amount before logging in
 wait_secs = random.randint(c.new_thread_low,c.new_thread_high)
 print("sleeping for " + str(wait_secs))
+time.sleep(wait_secs)
 
 #login mobile and desktop
 desktop = auth.Account(email, password, desktop_ua, proxy)
@@ -34,17 +35,17 @@ page = desktop.get("http://www.bing.com/rewardsapp/flyoutpage/?style=v2", cookie
 soup = BS(page.content,"html.parser")
 rewards = soup.findAll("ul",{"class" : "item"})
 extra_offers = []
-forbiddenwords = re.compile('quiz|redeem|goal|challenge|activate', re.IGNORECASE)
+forbiddenwords = re.compile('quiz|redeem|goal|challenge|activate|earn more points', re.IGNORECASE)
 progress = re.compile("(\d+) of (\d+)")
 for reward in rewards:
     reward_text = reward.text.encode("utf-8")
     if not forbiddenwords.search(reward_text):
         if "PC search" in reward_text:
-            desktop_left = (progress.search(reward_text).group(2) / 5) - (progress.search(reward_text).group(1) / 5)
-            desktop_searches = (progress.search(reward_text).group(2) / 5)
+            desktop_left = (int(progress.search(reward_text).group(2)) / 5) - (int(progress.search(reward_text).group(1)) / 5)
+            desktop_searches = (int(progress.search(reward_text).group(2)) / 5)
         elif "Mobile search" in reward_text:
-            mobile_left = (progress.search(reward_text).group(2) / 5) - (progress.search(reward_text).group(1) / 5)
-            mobile_searches = (progress.search(reward_text).group(2) / 5)
+            mobile_left = (int(progress.search(reward_text).group(2)) / 5) - (int(progress.search(reward_text).group(1)) / 5)
+            mobile_searches = (int(progress.search(reward_text).group(2)) / 5)
         else:
             for a in reward.findAll("a", href=True):
                 if a["href"] != "javascript:void(0)":
@@ -53,7 +54,7 @@ for reward in rewards:
 #searches throughout the period of time 6-8 hours default
 querytime = random.randint(c.querytime_low,c.querytime_high)
 querysalt = random.randint(c.querysalt_low,c.querysalt_high)
-querytimes = random.sample(range(1,int(querytime)),int(desktop_left + mobile_left + querysalt) - 1)
+querytimes = random.sample(range(1,int(querytime)),int(desktop_left + mobile_left + querysalt + len(extra_offers)) - 1)
 printed = False
 lasttype = random.choice(["desktop","mobile"])
 for i in range(0,int(querytime)+1):
@@ -66,8 +67,9 @@ for i in range(0,int(querytime)+1):
 		print(email + ": searches done")
 		sys.exit(1)
 	if i in querytimes:
-		if mobile_searches > mobile_left and desktop_searches > desktop_left:
-			pass
+		if mobile_searches > mobile_left and desktop_searches > desktop_left and len(extra_offers) > 0:
+			offer = random.choice(extra_offers)
+			desktop.get(offer, cookies=desktop.cookies)
 		elif desktop_searches > desktop_left and mobile_searches < mobile_left:
 			lasttype = "mobile"
 		elif desktop_searches < desktop_left and mobile_searches > mobile_left:

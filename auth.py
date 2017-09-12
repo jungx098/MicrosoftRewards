@@ -74,7 +74,6 @@ class Account:
             res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data, proxies=self.proxies, verify=False)
         else:
             res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data, verify=False)
-        print self.headers["User-Agent"]
         self.headers["Referer"] = URL
         return res
     
