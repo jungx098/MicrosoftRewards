@@ -11,10 +11,14 @@ class Account:
     data = {"i13":"0", "type":"11", "LoginOptions":"3", "lrt":"", "ps":"2", "psRNGCDefaultType":"", "psRNGCEntropy":"", "psRNGCSLK":"", "canary":"", "ctx":"", "NewUser":"1", "FoundMSAs":"", "fspost":"0", "i21":"0", "i2":"1", "i17":"0", "i18":"__ConvergedLoginPaginatedStrings%7C1%2C__ConvergedLogin_PCore%7C1%2C", "i19":"2" + str(randint(0, 5000))}
     proxies = {"http":"127.0.0.1:8080", "https":"127.0.0.1:8080"}
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, ua, proxy):
         self.data["login"] = email
         self.data["loginfmt"] = email
         self.data["passwd"] = password
+        self.headers["User-Agent"] = ua
+        if proxy != "127.0.0.1:8080":
+            self.proxies["http"] = proxy
+            self.proxies["https"] = proxy
         
     def login(self, mobile=False):
         postURL = self.preLogin()
@@ -27,8 +31,6 @@ class Account:
         self.headers["Host"] = c.host # Set Host to Bing Server
         res = self.post(form.get("action"), cookies=self.cookies, data=params)
         self.cookies = res.cookies # Set Cookies
-        if(mobile):
-            self.headers = c.mobileHeaders
         
     def preLogin(self):
         res = self.get(c.hostURL)
@@ -54,7 +56,8 @@ class Account:
         # Get PPSX
         index = res.text.index(",t:\'") # Find PPSX
         cutText = res.text[index + 4:] # Cut Text at Start of PPSX
-        PPSX = cutText[:cutText.index("\'")] # Cut at End of PPSX
+		PPSXs = ["P","Pa","Pas","Pass","Passp","Passpo","Passpor","Passport","PassportR","PassportRN"]
+        PPSX = random.choice(PPSXs)
         self.data["PPSX"] = PPSX
         # Finish Up
         self.cookies["wlidperf"] = "FR=L&ST=" + str(int(time.time() * 1000)) # Add Another Time Cookie
@@ -63,16 +66,16 @@ class Account:
     def logout(self):
         pass
     
-    def get(self, URL, params=None, cookies=None, data=None, proxy=False):
-        if(proxy):
+    def get(self, URL, params=None, cookies=None, data=None):
+        if(self.proxies["http"] != "127.0.0.1:8080"):
             res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data, proxies=self.proxies, verify=False)
         else:
             res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data)
         self.headers["Referer"] = URL
         return res
     
-    def post(self, URL, params=None, cookies=None, data=None, proxy=False):
-        if(proxy):
+    def post(self, URL, params=None, cookies=None, data=None):
+        if(self.proxies["http"] != "127.0.0.1:8080"):
             res = requests.post(URL, headers=self.headers, params=params, cookies=cookies, data=data, proxies=self.proxies, verify=False)
         else:
             res = requests.post(URL, headers=self.headers, params=params, cookies=cookies, data=data)
