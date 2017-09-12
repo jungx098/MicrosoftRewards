@@ -10,6 +10,11 @@ import re
 from bs4 import BeautifulSoup as BS
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+def get_current_points():
+	finder = re.compile("'(\d+)'")
+	page = desktop.get("https://www.bing.com/rewardsapp/reportActivity", cookies=desktop.cookies)
+	return int(finder.search(page.content).group(1))
+
 email = sys.argv[1].split(">")[0]
 password = sys.argv[1].split(">")[1]
 desktop_ua = sys.argv[1].split(">")[2]
@@ -29,6 +34,7 @@ desktop = auth.Account(email, password, desktop_ua, proxy)
 desktop.login()
 mobile = auth.Account(email, password, mobile_ua, proxy)
 print email + ": logged in"
+print email + ": current points: " + str(get_current_points())
 
 #parse rewards
 page = desktop.get("http://www.bing.com/rewardsapp/flyoutpage/?style=v2", cookies=desktop.cookies, extra_offer=True)
@@ -91,16 +97,16 @@ for i in range(0,int(querytime)+1):
 			count += 1
 		lasttype = random.choice(types)
 		gen = gt.queryGenerator(1)
-		query = gen.generateQueries(1,set())
+		query = str(gen.generateQueries(1,set()).pop())
 		if "desktop" in lasttype:
 			account = auth.Account(email, password, desktop_ua, proxy)
 			desktop_searches += 1
-			desktop.get(c.searchURL + str(query.pop()), cookies=desktop.cookies)
+			desktop.get(c.searchURL + query, cookies=desktop.cookies)
 		if "mobile" in lasttype:
 			account = auth.Account(email, password, mobile_ua, proxy)
 			mobile_searches += 1
-			mobile.get(c.searchURL + str(query.pop()), cookies=desktop.cookies)
-		print email + ": " + lasttype + " search"
+			mobile.get(c.searchURL + query, cookies=desktop.cookies)
+		print email + ": " + lasttype + " search: " + query
 		printed = False
 
 
