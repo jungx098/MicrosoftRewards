@@ -1,17 +1,18 @@
 import googleTrends as gt
 import auth
 import common as c
-import json
+import sys
 from time import sleep
 from random import uniform
 
-# Get Config
-with open("config.json", "r") as f:
-    config = json.load(f)
-count = config["count"]
-mobileCount = config["mobileCount"]
-delay = config["delay"]
-delayRandom = config["delayRandom"]
+email = sys.argv[1].split(">")[0]
+password = sys.argv[1].split(">")[1]
+desktop_ua = sys.argv[1].split(">")[2]
+mobile_ua = sys.argv[1].split(">")[3]
+try:
+    proxy = sys.argv[1].split(">")[4]
+except IndexError:
+    proxy = "127.0.0.1:8080"
 cur = 1 # Current Query Number
 account = auth.Account(config["email"], config["password"], desktop_ua, proxy) # Init Account
 # Generate PC Queries
