@@ -42,15 +42,15 @@ for reward in rewards:
     if not forbiddenwords.search(reward_text):
         if "PC search" in reward_text:
             desktop_left = (int(progress.search(reward_text).group(2)) / 5) - (int(progress.search(reward_text).group(1)) / 5)
-            desktop_searches = (int(progress.search(reward_text).group(2)) / 5)
+            desktop_searches = (int(progress.search(reward_text).group(1)) / 5)
         elif "Mobile search" in reward_text:
             mobile_left = (int(progress.search(reward_text).group(2)) / 5) - (int(progress.search(reward_text).group(1)) / 5)
-            mobile_searches = (int(progress.search(reward_text).group(2)) / 5)
+            mobile_searches = (int(progress.search(reward_text).group(1)) / 5)
         else:
             for a in reward.findAll("a", href=True):
                 if a["href"] != "javascript:void(0)":
                     extra_offers.append(a["href"].encode("utf-8"))
-		
+
 #searches throughout the period of time 6-8 hours default
 querytime = random.randint(c.querytime_low,c.querytime_high)
 querysalt = random.randint(c.querysalt_low,c.querysalt_high)
@@ -69,7 +69,8 @@ for i in range(0,int(querytime)+1):
 	if i in querytimes:
 		if mobile_searches > mobile_left and desktop_searches > desktop_left and len(extra_offers) > 0:
 			offer = random.choice(extra_offers)
-			desktop.get(offer, cookies=desktop.cookies)
+			extra_offers.remove(offer)
+			desktop.get("https://bing.com" + offer, cookies=desktop.cookies)
 		elif desktop_searches > desktop_left and mobile_searches < mobile_left:
 			lasttype = "mobile"
 		elif desktop_searches < desktop_left and mobile_searches > mobile_left:
