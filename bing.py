@@ -13,7 +13,7 @@ mobileCount = config["mobileCount"]
 delay = config["delay"]
 delayRandom = config["delayRandom"]
 cur = 1 # Current Query Number
-account = auth.Account(config["email"], config["password"]) # Init Account
+account = auth.Account(config["email"], config["password"], desktop_ua, proxy) # Init Account
 # Generate PC Queries
 gen = gt.queryGenerator(1)
 querySet = gen.generateQueries(count, set())
@@ -30,6 +30,7 @@ cur = 1 # Reset Current Query Number
 # Generate Mobile Queries
 gen = gt.queryGenerator(1)
 querySet = gen.generateQueries(mobileCount, set())
+account = auth.Account(config["email"], config["password"], mobile_ua, proxy) # Init Account
 account.login(mobile=True) # Login Account on Mobile
 # Do Searches
 for query in querySet:

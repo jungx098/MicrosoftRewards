@@ -56,7 +56,7 @@ class Account:
         # Get PPSX
         index = res.text.index(",t:\'") # Find PPSX
         cutText = res.text[index + 4:] # Cut Text at Start of PPSX
-		PPSXs = ["P","Pa","Pas","Pass","Passp","Passpo","Passpor","Passport","PassportR","PassportRN"]
+        PPSXs = ["P","Pa","Pas","Pass","Passp","Passpo","Passpor","Passport","PassportR","PassportRN"]
         PPSX = random.choice(PPSXs)
         self.data["PPSX"] = PPSX
         # Finish Up
