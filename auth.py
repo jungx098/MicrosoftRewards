@@ -1,8 +1,11 @@
 import requests
 import common as c
 import time
+import random
 from bs4 import BeautifulSoup
 from random import randint
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class Account:
 
@@ -38,7 +41,7 @@ class Account:
         index = res.text.index("WindowsLiveId") # Find URL
         cutText = res.text[index + 16:] # Cut Text at Start of URL
         loginURL = cutText[:cutText.index("\"")] # Cut at End of URL
-        loginURL = bytes(loginURL, encoding="UTF-8").decode("unicode_escape") # Unescape URL
+        loginURL = bytes(loginURL).encode("utf-8").decode("unicode_escape") # Unescape URL
         # Get Login Cookies
         self.headers["Host"] = c.loginHost # Set Host to Login Server
         res = self.get(loginURL)
@@ -54,8 +57,6 @@ class Account:
         PPFT = cutText[cutText.index("value=") + 7:cutText.index("\"/>")] # Cut PPFT
         self.data["PPFT"] = PPFT
         # Get PPSX
-        index = res.text.index(",t:\'") # Find PPSX
-        cutText = res.text[index + 4:] # Cut Text at Start of PPSX
         PPSXs = ["P","Pa","Pas","Pass","Passp","Passpo","Passpor","Passport","PassportR","PassportRN"]
         PPSX = random.choice(PPSXs)
         self.data["PPSX"] = PPSX
@@ -70,7 +71,8 @@ class Account:
         if(self.proxies["http"] != "127.0.0.1:8080"):
             res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data, proxies=self.proxies, verify=False)
         else:
-            res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data)
+            res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data, verify=False)
+        print self.headers["User-Agent"]
         self.headers["Referer"] = URL
         return res
     
@@ -78,6 +80,6 @@ class Account:
         if(self.proxies["http"] != "127.0.0.1:8080"):
             res = requests.post(URL, headers=self.headers, params=params, cookies=cookies, data=data, proxies=self.proxies, verify=False)
         else:
-            res = requests.post(URL, headers=self.headers, params=params, cookies=cookies, data=data)
+            res = requests.post(URL, headers=self.headers, params=params, cookies=cookies, data=data, verify=False)
         self.headers["Referer"] = URL
         return res

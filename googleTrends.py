@@ -1,12 +1,11 @@
-
-import urllib.request
+import urllib2
 import random
 from xml.etree import ElementTree
-from urllib.parse import quote_plus
+from urllib import quote_plus
 
 TRENDSURL = "http://www.google.com/trends/hottrends/atom/feed?pn=p1"
 SUGGESTURL = "http://suggestqueries.google.com/complete/search?output=toolbar&hl=en&q="
-MAX_QUERY_LEN = 250
+MAX_QUERY_LEN = 50
 
 class queryGenerator:
 
@@ -24,7 +23,7 @@ class queryGenerator:
         return result.copy()
     
     def __readXML(self,URL):
-        response = urllib.request.urlopen(URL)
+        response = urllib2.urlopen(URL)
         try:
             tree = ElementTree.parse(response)
         except:
@@ -62,7 +61,6 @@ class queryGenerator:
         parses Google Trends top trends and generates a set of unique queries. If the number
         of queries is not >= the requested number, a google suggestion will be called on all
         terms in the query set.  These suggestions will be added to the set as well.
-
         param queriesToGenerate the number of queries to return
         param history a set of previous searches
         """
@@ -73,12 +71,10 @@ class queryGenerator:
         self.unusedQueries -= history
         if queriesToGenerate > len(self.unusedQueries):
             self.unusedQueries = self.__pullAll()
-            if queriesToGenerate > len(self.unusedQueries): raise ValueError("too many queries requested")
+            if queriesToGenerate > len(self.unusedQueries): raise ValueError("to many queries requested")
 
         final = random.sample(self.unusedQueries, queriesToGenerate)
         finalSet = set(final)
         self.unusedQueries -= finalSet
         self.unusedQueries.update(removedHistory)
         return finalSet.copy()
-
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

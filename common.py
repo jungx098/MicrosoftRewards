@@ -11,3 +11,10 @@ acceptLang = "en-US,en;q=0.5"
 connection = "close"
 headers = {"Host" : host, "User-Agent" : ua, "Accept" : accept, "Accept-Language" : acceptLang, "Connection" : connection}
 mobileHeaders = {"Host" : host, "User-Agent" : mobile_ua, "Accept" : accept, "Accept-Language" : acceptLang, "Connection" : connection}
+last_type_chance = 0.8
+new_thread_low = 0
+new_thread_high = 0#1800
+querytime_low = 200#00
+querytime_high = 300#00
+querysalt_low = 5
+querysalt_high = 20
