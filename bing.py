@@ -6,6 +6,7 @@ import sys
 import urllib
 import time
 import urllib3
+from bs4 import BeautifulSoup as BS
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 email = sys.argv[1].split(">")[0]
@@ -27,6 +28,24 @@ desktop.login()
 mobile = auth.Account(email, password, mobile_ua, proxy)
 print email + ": logged in"
 
+#parse rewards
+page = desktop.get("http://www.bing.com/rewardsapp/flyoutpage/?style=v2", cookies=desktop.cookies, extra_offer=True)
+soup = BS(page.content,"html.parser")
+rewards = soup.findAll("ul",{"class" : "item"})
+desktop_search = ""
+mobile_search = ""
+extra_offers = []
+for reward in rewards:
+    if "quiz" not in reward.text.encode("utf-8") and "redeem" not in reward.text.encode("utf-8") and "goal" not in reward.text.encode("utf-8"):
+        if "PC search" in reward.text.encode("utf-8"):
+            desktop_search = reward.text.encode("utf-8")
+        elif "Mobile search" in reward.text.encode("utf-8"):
+            mobile_search = reward.text.encode("utf-8")
+        else:
+            for a in reward.findAll("a", href=True):
+                if a["href"] != "javascript:void(0)":
+                    extra_offers.append(a["href"].encode("utf-8"))
+		
 #searches throughout the period of time 6-8 hours default
 mobile_left = 20
 desktop_left = 30

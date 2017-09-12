@@ -67,7 +67,9 @@ class Account:
     def logout(self):
         pass
     
-    def get(self, URL, params=None, cookies=None, data=None):
+    def get(self, URL, params=None, cookies=None, data=None, extra_offer=False):
+        if(extra_offer):
+             self.headers["User-Agent"] = self.headers["User-Agent"] + " Edge/12.10136"
         if(self.proxies["http"] != "127.0.0.1:8080"):
             res = requests.get(URL, headers=self.headers, params=params, cookies=cookies, data=data, proxies=self.proxies, verify=False)
         else:
